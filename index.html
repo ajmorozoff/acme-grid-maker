@@ -6,23 +6,26 @@
     </head>
 
     <body>
+        <div class = "content">
+            <h1 class='heading'>Acme Grid Maker</h1>
+            <div class='form-entry'>
+                <input type='text' name='rows' id='rows-input' placeholder='Number of Rows'>
+                <p class='error-text' id='row-error'>Must be a number between 1 and 50</p>
+            </div>
+            
+            <div class='form-entry'>
+                <input type='text' name='columns' id='columns-input' placeholder='Number of Columns'>
+                <p class='error-text' id='column-error'>Must be a number between 1 and 50</p>
+            </div>
 
-        <h1 class='heading'>Acme Grid Maker</h1>
-        <div class='form-entry'>
-            <input type='text' name='rows' id='rows-input' placeholder='Number of Rows'>
-            <p class='error-text' id='row-error'></p>
-        </div>
-        
-        <div class='form-entry'>
-            <input type='text' name='columns' id='columns-input' placeholder='Number of Columns'>
-            <p class='error-text' id='column-error'></p>
-        </div>
+            <div class='form-entry'>
+                <button type='button' class='button-primary' id='create-button'>Make Grid</button>
+            </div>
 
-        <div class='form-entry'>
-            <button type='button' class='button-primary' id='create-button'>Make Grid</button>
-        </div>
-
-        <div class='grid' id='grid-container'>
+            <div class='grid' id='grid-container'>
+            </div>
+            
+            <p class='paragraph-primary' id='selected-text'></p>
         </div>
 
     </body>
@@ -31,5 +34,91 @@
         const createBtn = document.querySelector('#create-button');
         const rowInput = document.querySelector('#rows-input');
         const columnInput = document.querySelector('#columns-input');
+        const grid = document.querySelector('#grid-container');
+        const rowError = document.querySelector('#row-error');
+        const columnError = document.querySelector('#column-error');
+        const selectedText = document.querySelector('#selected-text');
+
+        rowError.style.visibility = 'hidden';
+        columnError.style.visibility = 'hidden';
+
+        let rowTotal = 0;
+        let columnTotal = 0;
+
+        createBtn.addEventListener('click', () => {
+            clearGrid();
+            renderGrid(rowTotal,columnTotal);
+            console.log('button clicked');
+        })
+
+        rowInput.addEventListener('keyup', () => {
+            
+            rowTotal = validateInput(rowInput);
+            if (rowTotal) {
+                createBtn.disabled = false;
+                rowError.style.visibility = 'hidden';
+            }
+            else {
+                createBtn.disabled = true;
+                rowError.style.visibility = 'visible';
+            }
+        })
+
+        columnInput.addEventListener('keyup', () => {
+            
+            columnTotal = validateInput(columnInput);
+            if (columnTotal) {
+                createBtn.disabled = false;
+                columnError.style.visibility = 'hidden';
+            }
+            else {
+                createBtn.disabled = true;
+                columnError.style.visibility = 'visible';
+            }
+        })
+
+        const validateInput = (field) => {
+            let input = parseInt(field.value, 10);
+            if (input) {
+                if (input <= 50) {
+                    
+                    return input;
+                }
+                return 0;
+            }
+            return 0;
+        }
+
+        const renderGrid = (rows, columns) => {
+            for (let i = 0; i < rows; i ++) {
+                let rowDiv = document.createElement('div');
+                rowDiv.classList.add('row');
+                for (let j = 0; j < columns; j++) {
+                    let squareDiv = document.createElement('div');
+                    squareDiv.classList.add('square');
+                    squareDiv.setAttribute('column-index',`${j}`);
+                    squareDiv.setAttribute('row-index',`${i}`);
+                    squareDiv.addEventListener('click', () => {
+                        squareDiv.classList.add('square-selected');
+                        renderSelectionText(squareDiv);
+                    })
+                    rowDiv.appendChild(squareDiv);
+                }
+                grid.appendChild(rowDiv);
+            }
+        }
+
+        const clearGrid = () => {
+            while (grid.hasChildNodes()) {
+                grid.removeChild(grid.firstChild);
+            }
+        }
+
+        const renderSelectionText = (element) => {
+            let rowStr = element.getAttribute('row-index');
+            let colStr = element.getAttribute('column-index');
+            selectedText.innerHTML = `rIdx: ${rowStr}, cIdx: ${colStr}`;
+        }
+
     </script>
 </html>
